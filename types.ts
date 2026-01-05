@@ -1,0 +1,168 @@
+export enum Language {
+  EN = 'EN',
+  CN = 'CN'
+}
+
+export enum UserRole {
+  STUDENT = 'STUDENT',
+  ADMIN = 'ADMIN'
+}
+
+export interface User {
+  id: string;
+  username: string;
+  avatar: string; // URL
+  role: UserRole;
+  creditScore: number;
+  bio: string;
+  isBanned: boolean;
+  joinDate: string;
+  wishlist: string[]; // List of Product IDs
+  following: string[]; // List of User IDs
+}
+
+export interface Product {
+  id: string;
+  sellerId: string;
+  title: string;
+  price: number;
+  description: string;
+  category: string;
+  image: string;
+  status: 'ACTIVE' | 'SOLD' | 'BANNED';
+  viewCount: number;
+  createdAt: string;
+  tags: string[];
+  buyerId?: string;
+}
+
+export interface Review {
+  id: string;
+  sellerId: string;
+  buyerId: string;
+  productId: string;
+  rating: number; // 1-5
+  content: string;
+  createdAt: string;
+}
+
+export interface Message {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  timestamp: string;
+  isRead: boolean;
+  type: 'CHAT' | 'SYSTEM';
+}
+
+export interface ChatSession {
+  withUserId: string; // The other person in the chat
+  lastMessage: Message;
+  unreadCount: number;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+}
+
+// i18n Dictionary Interface
+export interface Translations {
+  nav: {
+    home: string;
+    messages: string;
+    profile: string;
+    admin: string;
+    login: string;
+    logout: string;
+    sell: string;
+  };
+  home: {
+    searchPlaceholder: string;
+    categories: string;
+    hotSearch: string;
+    noItems: string;
+    price: string;
+    sortBy: string;
+    sortPriceAsc: string;
+    sortPriceDesc: string;
+    sortDate: string;
+    sortPopular: string;
+    results: string;
+    hideSold: string;
+    pagination: {
+      prev: string;
+      next: string;
+      page: string;
+      of: string;
+    };
+  };
+  product: {
+    seller: string;
+    credit: string;
+    chatNow: string;
+    description: string;
+    similar: string;
+    buy: string;
+    views: string;
+    addToWishlist: string;
+    removeFromWishlist: string;
+    follow: string;
+    unfollow: string;
+    following: string;
+  };
+  reviews: {
+    title: string;
+    noReviews: string;
+    leaveReview: string;
+    rating: string;
+    comment: string;
+    submit: string;
+    placeholder: string;
+    reviewed: string;
+    average: string;
+  };
+  profile: {
+    myListings: string;
+    myWishlist: string;
+    noWishlist: string;
+    history: string;
+    bought: string;
+    sold: string;
+    noHistory: string;
+    following: string;
+    noFollowing: string;
+  };
+  checkout: {
+    title: string;
+    summary: string;
+    address: string;
+    payment: string;
+    placeOrder: string;
+    total: string;
+    successTitle: string;
+    successMsg: string;
+    backHome: string;
+    viewOrder: string;
+  };
+  admin: {
+    dashboard: string;
+    users: string;
+    products: string;
+    ban: string;
+    unban: string;
+    takedown: string;
+    restore: string;
+  };
+  auth: {
+    welcome: string;
+    loginBtn: string;
+    registerBtn: string;
+    username: string;
+    password: string;
+  };
+}
