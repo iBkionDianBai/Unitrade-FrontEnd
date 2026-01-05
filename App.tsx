@@ -39,17 +39,17 @@ const App = () => {
     initSession();
   }, []);
 
-  const login = async (username: string) => {
-    const u = await api.auth.login(username);
-    setUser(u);
-    localStorage.setItem('session_user', JSON.stringify(u));
-  };
+    const login = async (username: string, password: string) => { // Added password here
+        const u = await api.auth.login(username, password);       // Passing both here
+        setUser(u);
+        localStorage.setItem('session_user', JSON.stringify(u));
+    };
 
-  const register = async (username: string) => {
-    const u = await api.auth.register(username);
-    setUser(u);
-    localStorage.setItem('session_user', JSON.stringify(u));
-  };
+    const register = async (username: string, password: string) => { // Added password here
+        const u = await api.auth.register(username, password);       // Passing both here
+        setUser(u);
+        localStorage.setItem('session_user', JSON.stringify(u));
+    };
 
   const logout = () => {
     setUser(null);

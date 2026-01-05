@@ -36,6 +36,11 @@ export const api = {
             // You may need to fetch the user separately or customize the view.
             return response.data.user;
         },
+        register: async (username: string, password: string): Promise<User> => {
+            // Registration typically goes to your UserViewSet (POST /api/users/)
+            const response = await apiClient.post('/users/', { username, password });
+            return response.data;
+        },
         getCurrentUser: async (id: string): Promise<User> => {
             const response = await apiClient.get(`/users/${id}/`);
             return response.data;
