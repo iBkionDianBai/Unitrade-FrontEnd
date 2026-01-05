@@ -15,9 +15,9 @@ const AuthPage = () => {
     setError('');
     try {
       if (isLogin) {
-        await login(username);
+        await login(username, password);
       } else {
-        await register(username);
+        await register(username, password);
       }
       navigate('/');
     } catch (err: any) {
@@ -64,9 +64,9 @@ const AuthPage = () => {
           <button onClick={() => setIsLogin(!isLogin)} className="hover:text-indigo-600 underline">
             {isLogin ? 'Need an account? Register' : 'Have an account? Login'}
           </button>
-          <div className="mt-4 text-xs text-gray-400">
-            For demo, try admins: admin1, admin2, admin3 (Password: any)
-          </div>
+          {/*<div className="mt-4 text-xs text-gray-400">*/}
+          {/*  For demo, try admins: admin1, admin2, admin3 (Password: any)*/}
+          {/*</div>*/}
         </div>
       </div>
     </div>

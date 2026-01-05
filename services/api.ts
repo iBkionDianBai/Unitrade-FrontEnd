@@ -23,11 +23,18 @@ apiClient.interceptors.request.use((config) => {
 export const api = {
     auth: {
         login: async (username: string, password: string): Promise<User> => {
-            // 对应后端的 TokenObtainPairView
-            const response = await apiClient.post('/auth/login/', { username, password });
+            // Ensure you are sending both fields in the data object
+            const response = await apiClient.post('/auth/login/', {
+                username: username,
+                password: password
+            });
+
             localStorage.setItem('access_token', response.data.access);
             localStorage.setItem('refresh_token', response.data.refresh);
-            return response.data.user; // 假设后端在登录接口额外返回了用户数据
+
+            // Note: Standard TokenObtainPairView does NOT return the user object.
+            // You may need to fetch the user separately or customize the view.
+            return response.data.user;
         },
         getCurrentUser: async (id: string): Promise<User> => {
             const response = await apiClient.get(`/users/${id}/`);
@@ -35,6 +42,10 @@ export const api = {
         },
         updateWishlist: async (userId: string, productId: string): Promise<User> => {
             const response = await apiClient.post(`/users/${userId}/toggle_wishlist/`, { productId });
+            return response.data;
+        },
+        toggleFollow: async (followerId: string, targetId: string): Promise<User> => {
+            const response = await apiClient.post(`/users/${followerId}/toggle_follow/`, {targetId});
             return response.data;
         }
     },
@@ -54,6 +65,19 @@ export const api = {
         },
         purchase: async (productId: string, buyerId: string): Promise<void> => {
             await apiClient.post(`/products/${productId}/purchase/`, { buyerId });
+        },
+        getRelated: async (category: string, excludeId: string): Promise<Product[]> => {
+            const response = await apiClient.get('/products/', {
+                params: { category, excludeId, limit: 3 }
+            });
+            return response.data;
+        }
+    },
+
+    users: {
+        get: async (id: string): Promise<User> => {
+            const response = await apiClient.get(`/users/${id}/`);
+            return response.data;
         }
     },
 
@@ -64,6 +88,17 @@ export const api = {
         },
         send: async (senderId: string, receiverId: string, content: string): Promise<Message> => {
             const response = await apiClient.post('/messages/', { senderId, receiverId, content });
+            return response.data;
+        }
+    },
+
+    reviews: {
+        list: async (sellerId: string): Promise<Review[]> => {
+            const response = await apiClient.get('/reviews/', { params: { sellerId } });
+            return response.data;
+        },
+        create: async (reviewData: Omit<Review, 'id' | 'createdAt'>): Promise<Review> => {
+            const response = await apiClient.post('/reviews/', reviewData);
             return response.data;
         }
     },

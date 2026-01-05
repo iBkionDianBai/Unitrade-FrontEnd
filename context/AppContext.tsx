@@ -3,8 +3,8 @@ import { User, Language, Translations } from '../types';
 
 export interface AppContextType {
   user: User | null;
-  login: (username: string) => Promise<void>;
-  register: (username: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
+  register: (username: string, password: string) => Promise<void>;
   logout: () => void;
   lang: Language;
   setLang: (l: Language) => void;
