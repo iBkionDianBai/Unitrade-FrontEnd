@@ -15,6 +15,7 @@ import AdminPage from './pages/AdminPage';
 import CheckoutPage from './pages/CheckoutPage';
 import PurchaseSuccessPage from './pages/PurchaseSuccessPage';
 import WithdrawPage from "@/pages/WithdrawPage.dsx.tsx";
+import ProtectedRoute from "@/components/ProtectedRoute.tsx";
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -89,15 +90,28 @@ const App = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/product/:id" element={<ProductDetailPage />} />
-            <Route path="/checkout/:id" element={<CheckoutPage />} />
-            <Route path="/checkout/success/:id" element={<PurchaseSuccessPage />} />
-            <Route path="/messages" element={<MessagesPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/profile/:id" element={<ProfilePage />} />
-            <Route path="/sell" element={<SellItemPage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/withdraw" element={<WithdrawPage />} />
-            <Route path="*" element={<Navigate to="/" />} />
+              {/* Protected Routes */}
+              <Route path="/messages" element={
+                  <ProtectedRoute><MessagesPage /></ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                  <ProtectedRoute><ProfilePage /></ProtectedRoute>
+              } />
+              <Route path="/profile/:id" element={
+                  <ProtectedRoute><ProfilePage /></ProtectedRoute>
+              } />
+              <Route path="/sell" element={
+                  <ProtectedRoute><SellItemPage /></ProtectedRoute>
+              } />
+              <Route path="/checkout/:id" element={
+                  <ProtectedRoute><CheckoutPage /></ProtectedRoute>
+              } />
+              <Route path="/withdraw" element={
+                  <ProtectedRoute><WithdrawPage /></ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                  <ProtectedRoute><AdminPage /></ProtectedRoute>
+              } />
           </Routes>
         </Layout>
       </BrowserRouter>

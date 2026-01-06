@@ -19,6 +19,7 @@ export interface User {
   joinDate: string;
   wishlist: string[]; // List of Product IDs
   following: string[]; // List of User IDs
+  walletBalance: number;
 }
 
 export interface Product {
@@ -29,7 +30,7 @@ export interface Product {
   description: string;
   category: string;
   image: string;
-  status: 'ACTIVE' | 'SOLD' | 'BANNED';
+  status: 'ACTIVE' | 'SOLD' | 'RECEIVED' | 'BANNED';
   viewCount: number;
   createdAt: string;
   tags: string[];
@@ -94,6 +95,7 @@ export interface Translations {
     logoutConfirmMsg: string;   // +
     cancel: string;             // +
     confirm: string;
+    return: string;
   };
   home: {
     searchPlaceholder: string;
@@ -117,6 +119,7 @@ export interface Translations {
       page: string;
       of: string;
     };
+
   };
   product: {
     seller: string;
@@ -153,6 +156,9 @@ export interface Translations {
     noHistory: string;
     following: string;
     noFollowing: string;
+    editBio: string;  // 新增
+    saveBio: string;  // 新增
+    bioPlaceholder: string; // 新增
   };
   checkout: {
     title: string;
@@ -185,6 +191,10 @@ export interface Translations {
     activeStatus: string;       // +
     bannedStatus: string;       // +
     confirmMsg: string;         // +
+    wallet: string;          // 新增：钱包文字
+    withdraw: string;        // 新增：提现文字
+    withdrawSuccess: string; // 新增：提现成功提示
+    confirmReceived: string; // 新增：确认收货文字
   };
   auth: {
     welcome: string;

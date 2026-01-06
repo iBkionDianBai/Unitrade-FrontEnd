@@ -95,6 +95,10 @@ export const api = {
             const response = await apiClient.get(`/users/${id}/`);
             return response.data;
         },
+        update: async (id: string, userData: Partial<User>): Promise<User> => {
+            const response = await apiClient.patch(`/users/${id}/`, userData);
+            return response.data;
+        },
         getProfileData: async (id: string) => {
             const response = await apiClient.get(`/users/${id}/profile_data/`);
             return response.data;
