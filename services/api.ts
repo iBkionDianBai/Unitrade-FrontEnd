@@ -32,6 +32,7 @@ export const api = {
             localStorage.setItem('access_token', response.data.access);
             localStorage.setItem('refresh_token', response.data.refresh);
 
+
             // Note: Standard TokenObtainPairView does NOT return the user object.
             // You may need to fetch the user separately or customize the view.
             if (response.data.user) {
