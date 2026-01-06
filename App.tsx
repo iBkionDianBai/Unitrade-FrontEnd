@@ -14,6 +14,7 @@ import SellItemPage from './pages/SellItemPage';
 import AdminPage from './pages/AdminPage';
 import CheckoutPage from './pages/CheckoutPage';
 import PurchaseSuccessPage from './pages/PurchaseSuccessPage';
+import WithdrawPage from "@/pages/WithdrawPage.dsx.tsx";
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -95,6 +96,7 @@ const App = () => {
             <Route path="/profile/:id" element={<ProfilePage />} />
             <Route path="/sell" element={<SellItemPage />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/withdraw" element={<WithdrawPage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Layout>

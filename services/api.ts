@@ -75,15 +75,19 @@ export const api = {
             const response = await apiClient.post('/products/', productData);
             return response.data;
         },
-        purchase: async (productId: string, buyerId: string): Promise<void> => {
-            await apiClient.post(`/products/${productId}/purchase/`, { buyerId });
+        purchase: async (productId: string, buyerId: string, address: string): Promise<void> => {
+            // 将 address 放入 POST 请求体中
+            await apiClient.post(`/products/${productId}/purchase/`, { buyerId, address });
         },
         getRelated: async (category: string, excludeId: string): Promise<Product[]> => {
             const response = await apiClient.get('/products/', {
                 params: { category, excludeId, limit: 3 }
             });
             return response.data;
-        }
+        },
+        confirmReceived: async (productId: string, buyerId: string) => {
+            await apiClient.post(`/products/${productId}/confirm_received/`, { buyerId });
+        },
     },
 
     users: {
@@ -93,6 +97,10 @@ export const api = {
         },
         getProfileData: async (id: string) => {
             const response = await apiClient.get(`/users/${id}/profile_data/`);
+            return response.data;
+        },
+        withdraw: async (userId: string, amount: number, cardNumber: string) => {
+            const response = await apiClient.post(`/users/${userId}/withdraw/`, { amount, cardNumber });
             return response.data;
         }
     },

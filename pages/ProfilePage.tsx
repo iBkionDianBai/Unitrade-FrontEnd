@@ -7,6 +7,9 @@ import { ShoppingBag, Tag, MessageCircle, UserX, ShieldCheck, UserPlus, UserChec
 
 const ProfilePage = () => {
     const { user, t, toggleFollow } = useContext(AppContext);
+    const [showWithdraw, setShowWithdraw] = useState(false);
+    const [withdrawAmount, setWithdrawAmount] = useState('');
+    const [cardNumber, setCardNumber] = useState('');
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -59,6 +62,21 @@ const ProfilePage = () => {
     if (!targetUserId && !loading) return <Navigate to="/auth" />;
     if (loading) return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>;
     if (!profileUser) return <div className="text-center py-20">User not found</div>;
+
+    const handleConfirmReceived = async (productId: string) => {
+        if(!user) return;
+        await api.products.confirmReceived(productId, user.id);
+        // 刷新数据
+        fetchData();
+    };
+
+    const handleWithdrawSubmit = async () => {
+        if(!user) return;
+        const res = await api.users.withdraw(user.id, Number(withdrawAmount), cardNumber);
+        setUser({ ...user, walletBalance: res.newBalance });
+        setShowWithdraw(false);
+        alert("提现已受理，资金将在24小时内到账。");
+    };
 
     const handleChat = async (e: React.MouseEvent, product?: Product) => {
         e.stopPropagation();

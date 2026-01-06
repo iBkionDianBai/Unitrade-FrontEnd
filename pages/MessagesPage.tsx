@@ -22,29 +22,38 @@ const MessagesPage = () => {
         const fetchMessages = async () => {
             setLoading(true);
             try {
+                // 1. 获取当前用户的所有消息
                 const msgs = await api.messages.list(user.id);
                 setMessages(msgs);
-                
-                // Identify unique users
-                const userIds = new Set(msgs.map(m => m.senderId === user.id ? m.receiverId : m.senderId));
-                // Fetch info for these users
+
+                // 2. 识别所有唯一的聊天伙伴 ID
+                const userIds = Array.from(new Set(
+                    msgs.map(m => m.senderId === user.id ? m.receiverId : m.senderId)
+                ));
+
+                // 3. 关键修复：从真实后端 API 获取这些用户的信息
                 const partners: Record<string, User> = {};
-                for (const uid of userIds) {
-                    // For now, simpler to use sync mockDb or parallel fetch
-                    // In real app: await api.users.get(uid)
-                    const u = mockDb.getUser(uid);
-                    if(u) partners[uid] = u;
-                }
+
+                // 使用 Promise.all 并行获取，提高加载速度
+                await Promise.all(userIds.map(async (uid) => {
+                    try {
+                        const partnerData = await api.users.get(uid);
+                        partners[uid] = partnerData;
+                    } catch (err) {
+                        console.error(`Failed to fetch info for user ${uid}`, err);
+                    }
+                }));
+
                 setChatPartners(partners);
 
-                // 3. 关键逻辑：如果存在从详情页传来的 sellerId，自动选中它
+                // 如果有从详情页传来的 sellerId，自动选中
                 const targetId = location.state?.sellerId;
                 if (targetId) {
                     setSelectedChat(targetId);
                 }
 
             } catch(e) {
-                console.error(e);
+                console.error("Failed to load messages:", e);
             } finally {
                 setLoading(false);
             }

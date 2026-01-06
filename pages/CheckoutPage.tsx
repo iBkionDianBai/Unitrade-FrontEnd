@@ -51,7 +51,7 @@ const CheckoutPage = () => {
     setIsProcessing(true);
     
     try {
-        await api.products.purchase(product.id, user.id);
+        await api.products.purchase(product.id, user.id, address);
         navigate(`/checkout/success/${product.id}`);
     } catch (err: any) {
         alert(err.message || "Transaction failed");
