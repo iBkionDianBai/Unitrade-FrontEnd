@@ -34,7 +34,13 @@ export const api = {
 
             // Note: Standard TokenObtainPairView does NOT return the user object.
             // You may need to fetch the user separately or customize the view.
-            return response.data.user;
+            if (response.data.user) {
+                return response.data.user;
+            } else {
+                // 这是一个折中方案：我们需要知道当前登录的是谁
+                // 如果后端无法返回，您可能需要后端自定义 TokenView
+                throw new Error("Login successful but user data missing. Please check backend response.");
+            }
         },
         register: async (username: string, password: string): Promise<User> => {
             // Registration typically goes to your UserViewSet (POST /api/users/)
@@ -86,6 +92,7 @@ export const api = {
         }
     },
 
+
     messages: {
         list: async (userId: string): Promise<Message[]> => {
             const response = await apiClient.get('/messages/', { params: { userId } });
@@ -113,8 +120,18 @@ export const api = {
             const response = await apiClient.get('/users/admin_list/');
             return response.data;
         },
+        // Add this method
+        getAllProducts: async (): Promise<Product[]> => {
+            // Admin sees all products, including banned ones
+            const response = await apiClient.get('/products/');
+            return response.data;
+        },
         toggleBanUser: async (userId: string, isBanned: boolean) => {
             await apiClient.post(`/users/${userId}/toggle_ban/`, { isBanned });
+        },
+        // Add this method
+        toggleProductStatus: async (productId: string, status: string) => {
+            await apiClient.post(`/products/${productId}/toggle_status/`, { status });
         }
     }
 };

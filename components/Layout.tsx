@@ -1,13 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react'; // Added useState
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-  ShoppingBag, 
-  MessageCircle, 
-  User as UserIcon, 
-  LogOut, 
-  ShieldCheck, 
-  Globe, 
-  PlusCircle 
+import {
+  ShoppingBag,
+  MessageCircle,
+  User as UserIcon,
+  LogOut,
+  ShieldCheck,
+  Globe,
+  PlusCircle,
+  AlertCircle // Added AlertCircle icon for the popup
 } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { UserRole, Language } from '../types';
@@ -16,6 +17,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout, t, lang, setLang } = useContext(AppContext);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // State to control the custom logout modal
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const navItems = [
     { path: '/', label: t.nav.home, icon: ShoppingBag },
@@ -27,67 +31,125 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     navItems.push({ path: '/admin', label: t.nav.admin, icon: ShieldCheck });
   }
 
+  // Handle actual logout and navigation
+  const confirmLogout = () => {
+    logout();
+    setShowLogoutModal(false);
+    navigate('/');
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 text-slate-800">
-      <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-2">
-              <span className="text-white font-bold text-xl">U</span>
-            </div>
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-              UniTrade
-            </h1>
-          </div>
-
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className={`flex items-center text-sm font-medium transition-colors ${
-                  location.pathname === item.path
-                    ? 'text-indigo-600'
-                    : 'text-gray-500 hover:text-gray-900'
-                }`}
-              >
-                <item.icon className="w-4 h-4 mr-2" />
-                {item.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => setLang(lang === Language.EN ? Language.CN : Language.EN)}
-              className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"
-            >
-              <Globe className="w-5 h-5" />
-            </button>
-            
-            {user ? (
-              <div className="flex items-center gap-3">
-                 <button onClick={() => navigate('/sell')} className="hidden sm:flex items-center px-4 py-2 bg-indigo-600 text-white rounded-full text-sm font-medium hover:bg-indigo-700 transition shadow-md hover:shadow-lg">
-                  <PlusCircle className="w-4 h-4 mr-2" />
-                  {t.nav.sell}
-                </button>
-                <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-gray-200" />
-                <button onClick={logout} className="text-gray-500 hover:text-red-600">
-                  <LogOut className="w-5 h-5" />
-                </button>
+      <div className="min-h-screen flex flex-col bg-gray-50 text-slate-800">
+        <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            {/* Logo Section */}
+            <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
+              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-2">
+                <span className="text-white font-bold text-xl">U</span>
               </div>
-            ) : (
-              <button onClick={() => navigate('/auth')} className="text-indigo-600 font-medium">
-                {t.nav.login}
+              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                UniTrade
+              </h1>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              {navItems.map((item) => (
+                  <button
+                      key={item.path}
+                      onClick={() => navigate(item.path)}
+                      className={`flex items-center text-sm font-medium transition-colors ${
+                          location.pathname === item.path
+                              ? 'text-indigo-600'
+                              : 'text-gray-500 hover:text-gray-900'
+                      }`}
+                  >
+                    <item.icon className="w-4 h-4 mr-2" />
+                    {item.label}
+                  </button>
+              ))}
+            </div>
+
+            {/* Right-side actions */}
+            <div className="flex items-center space-x-4">
+              <button
+                  onClick={() => setLang(lang === Language.EN ? Language.CN : Language.EN)}
+                  className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"
+              >
+                <Globe className="w-5 h-5" />
               </button>
-            )}
+
+              {user ? (
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => navigate('/sell')} className="hidden sm:flex items-center px-4 py-2 bg-indigo-600 text-white rounded-full text-sm font-medium hover:bg-indigo-700 transition shadow-md hover:shadow-lg">
+                      <PlusCircle className="w-4 h-4 mr-2" />
+                      {t.nav.sell}
+                    </button>
+                    <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-gray-200" />
+                    {/* Trigger Modal on Click */}
+                    <button
+                        onClick={() => setShowLogoutModal(true)}
+                        className="text-gray-500 hover:text-red-600 transition"
+                    >
+                      <LogOut className="w-5 h-5" />
+                    </button>
+                  </div>
+              ) : (
+                  <button onClick={() => navigate('/auth')} className="text-indigo-600 font-medium">
+                    {t.nav.login}
+                  </button>
+              )}
+            </div>
           </div>
-        </div>
-      </header>
-      <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 page-transition-enter-active">
-        {children}
-      </main>
-    </div>
+        </header>
+
+        <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 page-transition-enter-active">
+          {children}
+        </main>
+
+        {/* Custom Styled Logout Confirmation Popup */}
+        {showLogoutModal && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+              {/* Overlay Background */}
+              <div
+                  className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                  onClick={() => setShowLogoutModal(false)}
+              ></div>
+
+              {/* Modal Container */}
+              <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-gray-100 animate-in fade-in zoom-in duration-200">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
+                    <AlertCircle className="w-8 h-8 text-red-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {lang === Language.EN ? "Confirm Logout" : "确认退出"}
+                  </h3>
+                  <p className="text-gray-500 mb-8 text-sm leading-relaxed">
+                    {lang === Language.EN
+                        ? "Are you sure you want to log out? You will need to sign in again to access your account."
+                        : "您确定要退出登录吗？退出后，您需要重新登录才能访问您的个人信息。"}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-3 w-full">
+                    <button
+                        onClick={() => setShowLogoutModal(false)}
+                        className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition text-sm"
+                    >
+                      {lang === Language.EN ? "Cancel" : "取消"}
+                    </button>
+                    <button
+                        onClick={confirmLogout}
+                        className="px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-100 text-sm"
+                    >
+                      {lang === Language.EN ? "Logout" : "退出登录"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        )}
+      </div>
   );
 };
 
