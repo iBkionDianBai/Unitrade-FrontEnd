@@ -17,26 +17,27 @@ import {
     ArrowUpRight,
     CheckCircle2,
     Clock,
-    Edit2
+    Edit2,
+    AlertCircle
 } from 'lucide-react';
 
 const ProfilePage = () => {
-    const { user: currentUser, t, toggleFollow, setUser} = useContext(AppContext);
+    const { user: currentUser, t, toggleFollow, setUser } = useContext(AppContext);
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // 确定展示哪个用户的资料
+    // Determine which user profile to show
     const targetUserId = id || currentUser?.id;
     const isOwnProfile = currentUser && targetUserId === currentUser.id;
 
-    // 状态管理
+    // UI States
     const [profileUser, setProfileUser] = useState<User | null>(null);
     const [activeTab, setActiveTab] = useState<'listings' | 'wishlist' | 'history' | 'following'>('listings');
     const [isEditingBio, setIsEditingBio] = useState(false);
     const [bioDraft, setBioDraft] = useState('');
     const [savingBio, setSavingBio] = useState(false);
 
-    // 数据状态
+    // Data States
     const [myActiveListings, setMyActiveListings] = useState<Product[]>([]);
     const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
     const [soldHistory, setSoldHistory] = useState<Product[]>([]);
@@ -48,12 +49,10 @@ const ProfilePage = () => {
         if (!targetUserId) return;
         setLoading(true);
         try {
-            // 获取用户信息
             const u = await api.users.get(targetUserId);
             setProfileUser(u);
             setBioDraft(u.bio || '');
 
-            // 获取资料关联数据
             const data = await api.users.getProfileData(targetUserId);
             setMyActiveListings(data.listings || []);
             setWishlistProducts(data.wishlist || []);
@@ -69,16 +68,35 @@ const ProfilePage = () => {
 
     useEffect(() => {
         fetchData();
-    }, [targetUserId, user, isOwnProfile]);
+    }, [targetUserId, currentUser?.id]); // Refetch if the target user or current user changes
 
-    // 处理确认收货
+    // Update Bio Logic
+    const handleUpdateBio = async () => {
+        if (!currentUser || !profileUser) return;
+        setSavingBio(true);
+        try {
+            const updatedUser = await api.users.update(currentUser.id, { bio: bioDraft });
+            setProfileUser(updatedUser);
+            if (isOwnProfile) {
+                setUser(updatedUser); // Sync changes to global context
+            }
+            setIsEditingBio(false);
+        } catch (error) {
+            console.error("Failed to update bio", error);
+            alert("Update failed. Please try again.");
+        } finally {
+            setSavingBio(false);
+        }
+    };
+
+    // Confirm Receipt Logic
     const handleConfirmReceived = async (e: React.MouseEvent, productId: string) => {
         e.stopPropagation();
-        if(!currentUser) return;
+        if (!currentUser) return;
         try {
             await api.products.confirmReceived(productId, currentUser.id);
-            alert(t.admin.confirmMsg || "Item received! Funds transferred to seller.");
-            fetchData(); // 刷新数据以更新余额和状态
+            alert(t.admin.confirmMsg);
+            fetchData(); // Refresh to update status and wallet balance
         } catch (err) {
             alert("Failed to confirm receipt.");
         }
@@ -114,10 +132,9 @@ const ProfilePage = () => {
     if (loading) return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>;
     if (!profileUser) return <div className="text-center py-20">User not found</div>;
 
-    // 通用商品卡片渲染
     const renderProductCard = (product: Product, isHistory = false) => (
         <div key={product.id} onClick={() => navigate(`/product/${product.id}`)} className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-4 cursor-pointer hover:shadow-lg transition relative group">
-            <img src={product.image} className="w-24 h-24 rounded-xl object-cover bg-gray-200 flex-shrink-0" alt={product.title}/>
+            <img src={product.image} className="w-24 h-24 rounded-xl object-cover bg-gray-200 flex-shrink-0" alt={product.title} />
             <div className="flex-1 flex flex-col justify-between">
                 <div>
                     <div className="flex justify-between items-start">
@@ -134,16 +151,16 @@ const ProfilePage = () => {
 
                 <div className="flex justify-between items-center mt-2">
                     <div className="text-[10px] text-gray-400 font-medium">
-                        {product.viewCount} views • {product.createdAt.split('T')[0]}
+                        {product.viewCount} {t.product.views} • {product.createdAt.split('T')[0]}
                     </div>
 
-                    {/* 买家确认收货按钮 */}
+                    {/* Buyer Confirm Receipt Button */}
                     {isHistory && isOwnProfile && product.status === 'SOLD' && product.buyerId === currentUser?.id && (
                         <button
                             onClick={(e) => handleConfirmReceived(e, product.id)}
                             className="px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition shadow-sm"
                         >
-                            Confirm Received
+                            {t.admin.confirmReceived}
                         </button>
                     )}
                 </div>
@@ -152,17 +169,58 @@ const ProfilePage = () => {
     );
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 pb-12">
-            {/* 顶部个人资料卡片 */}
+        <div className="max-w-5xl mx-auto space-y-8 pb-12 px-4">
+            {/* Profile Header */}
             <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col md:flex-row items-center md:items-start gap-8 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 -z-10"></div>
-                <img src={profileUser.avatar} className="w-32 h-32 rounded-full border-4 border-white shadow-xl z-10 object-cover" alt="profile"/>
+                <img src={profileUser.avatar} className="w-32 h-32 rounded-full border-4 border-white shadow-xl z-10 object-cover" alt="profile" />
                 <div className="text-center md:text-left flex-1 z-10 mt-4">
                     <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-4">
-                        <div>
+                        <div className="flex-1">
                             <h1 className="text-3xl font-black text-gray-900 mb-1">{profileUser.username}</h1>
-                            <p className="text-gray-500 text-sm mb-4 max-w-lg leading-relaxed">{profileUser.bio || "This user prefers to keep a low profile."}</p>
+
+                            {/* Editable Bio Section */}
+                            {isEditingBio ? (
+                                <div className="mt-2 space-y-2">
+                                    <textarea
+                                        value={bioDraft}
+                                        onChange={(e) => setBioDraft(e.target.value)}
+                                        placeholder={t.profile.bioPlaceholder}
+                                        className="w-full p-3 text-sm border border-indigo-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none min-h-[80px]"
+                                    />
+                                    <div className="flex gap-2 justify-center md:justify-start">
+                                        <button
+                                            onClick={handleUpdateBio}
+                                            disabled={savingBio}
+                                            className="px-4 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                                        >
+                                            {savingBio ? t.common.loading : t.profile.saveBio}
+                                        </button>
+                                        <button
+                                            onClick={() => { setIsEditingBio(false); setBioDraft(profileUser.bio || ''); }}
+                                            className="px-4 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-lg hover:bg-gray-200"
+                                        >
+                                            {t.common.cancel}
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="relative group inline-block">
+                                    <p className="text-gray-500 text-sm mb-4 leading-relaxed italic">
+                                        {profileUser.bio || "No bio added yet."}
+                                    </p>
+                                    {isOwnProfile && (
+                                        <button
+                                            onClick={() => setIsEditingBio(true)}
+                                            className="absolute -right-6 top-0 text-gray-300 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition"
+                                        >
+                                            <Edit2 className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </div>
+                            )}
                         </div>
+
                         {!isOwnProfile && (
                             <div className="flex gap-2">
                                 <button onClick={(e) => handleChat(e)} className="p-3 text-indigo-600 bg-white border border-indigo-100 rounded-xl hover:bg-indigo-50 transition shadow-sm">
@@ -189,7 +247,7 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            {/* 钱包区域 (仅自己可见) */}
+            {/* Wallet Section */}
             {isOwnProfile && (
                 <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2rem] p-8 text-white shadow-xl shadow-indigo-100 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-6">
@@ -197,7 +255,7 @@ const ProfilePage = () => {
                             <Wallet className="w-8 h-8" />
                         </div>
                         <div>
-                            <p className="text-indigo-100 text-xs font-bold uppercase tracking-widest mb-1">Available Balance</p>
+                            <p className="text-indigo-100 text-xs font-bold uppercase tracking-widest mb-1">{t.admin.wallet}</p>
                             <h2 className="text-4xl font-black tabular-nums">${currentUser.walletBalance?.toFixed(2) || '0.00'}</h2>
                         </div>
                     </div>
@@ -210,15 +268,15 @@ const ProfilePage = () => {
                 </div>
             )}
 
-            {/* 标签页导航 */}
-            <div className="bg-white p-1.5 rounded-2xl border border-gray-100 flex gap-2 w-fit">
+            {/* Tabs Navigation */}
+            <div className="bg-white p-1.5 rounded-2xl border border-gray-100 flex gap-2 w-fit mx-auto md:mx-0 overflow-x-auto max-w-full">
                 {(['listings', 'wishlist', 'history', 'following'] as const).map(tab => {
                     if (tab === 'wishlist' && !isOwnProfile) return null;
                     return (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition capitalize ${activeTab === tab ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'text-gray-400 hover:text-gray-600'}`}
+                            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition capitalize whitespace-nowrap ${activeTab === tab ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'text-gray-400 hover:text-gray-600'}`}
                         >
                             {tab === 'listings' && isOwnProfile ? t.profile.myListings : t.profile[tab as keyof typeof t.profile] || tab}
                         </button>
@@ -226,10 +284,10 @@ const ProfilePage = () => {
                 })}
             </div>
 
-            {/* 列表内容 */}
+            {/* Tab Content */}
             <div className="min-h-[400px]">
                 {activeTab === 'listings' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {myActiveListings.length > 0 ? myActiveListings.map(p => renderProductCard(p)) : (
                             <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-400 bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
                                 <Tag className="w-12 h-12 mb-4 opacity-20" />
@@ -240,7 +298,7 @@ const ProfilePage = () => {
                 )}
 
                 {activeTab === 'wishlist' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {wishlistProducts.length > 0 ? wishlistProducts.map(p => renderProductCard(p)) : (
                             <div className="col-span-full text-center py-20 text-gray-400 italic">{t.profile.noWishlist}</div>
                         )}
@@ -249,13 +307,12 @@ const ProfilePage = () => {
 
                 {activeTab === 'history' && (
                     <div className="space-y-12">
-                        {/* 购买记录 (私密) */}
                         {isOwnProfile && (
                             <section>
                                 <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                                     <ShoppingBag className="w-5 h-5 text-indigo-600" /> {t.profile.bought}
                                 </h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {purchasedHistory.length > 0 ? purchasedHistory.map(p => renderProductCard(p, true)) : (
                                         <p className="text-gray-400 text-sm italic py-4">{t.profile.noHistory}</p>
                                     )}
@@ -263,12 +320,11 @@ const ProfilePage = () => {
                             </section>
                         )}
 
-                        {/* 卖出记录 (公开) */}
                         <section>
                             <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                                 <Clock className="w-5 h-5 text-orange-500" /> {t.profile.sold}
                             </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {soldHistory.length > 0 ? soldHistory.map(p => renderProductCard(p)) : (
                                     <p className="text-gray-400 text-sm italic py-4">{t.profile.noHistory}</p>
                                 )}
@@ -288,7 +344,7 @@ const ProfilePage = () => {
                                 <img src={u.avatar} className="w-16 h-16 rounded-2xl border border-gray-100 group-hover:scale-105 transition object-cover" alt={u.username} />
                                 <div className="flex-1 overflow-hidden">
                                     <h3 className="font-bold text-gray-900 truncate group-hover:text-indigo-600 transition">{u.username}</h3>
-                                    <p className="text-gray-400 text-xs truncate mb-2 uppercase font-black tracking-tighter">{u.role}</p>
+                                    <p className="text-gray-400 text-[10px] truncate mb-2 uppercase font-black tracking-tighter">{u.role}</p>
                                     <div className="text-[10px] text-green-600 font-bold flex items-center">
                                         <ShieldCheck className="w-3 h-3 mr-1" /> Score: {u.creditScore}
                                     </div>
