@@ -52,10 +52,13 @@ const ProductDetailPage = () => {
   if (!product || !seller) return <div>Product not found</div>;
 
   const handleChat = async () => {
-      if(!user) return navigate('/auth');
-      // Create a greeting message automatically
+      if (!user) return navigate('/auth');
+
+      // 自动发送一条问候消息以确保会话存在
       await api.messages.send(user.id, seller.id, `Hi, I'm interested in your ${product.title}`);
-      navigate('/messages');
+
+      // 关键修改：传递 sellerId 到消息页面
+      navigate('/messages', { state: { sellerId: seller.id } });
   };
 
   const handleBuyClick = () => {

@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { api } from '../services/api';
@@ -8,6 +8,7 @@ import { mockDb } from '../services/mockDb'; // Keep strictly for helper name lo
 
 const MessagesPage = () => {
     const { user } = useContext(AppContext);
+    const location = useLocation();
     const [selectedChat, setSelectedChat] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [msgInput, setMsgInput] = useState('');
@@ -36,6 +37,12 @@ const MessagesPage = () => {
                 }
                 setChatPartners(partners);
 
+                // 3. 关键逻辑：如果存在从详情页传来的 sellerId，自动选中它
+                const targetId = location.state?.sellerId;
+                if (targetId) {
+                    setSelectedChat(targetId);
+                }
+
             } catch(e) {
                 console.error(e);
             } finally {
@@ -43,7 +50,7 @@ const MessagesPage = () => {
             }
         };
         fetchMessages();
-    }, [user]);
+    }, [user, location.state]);
 
     const conversations = Array.from(new Set(messages.map(m => m.senderId === user?.id ? m.receiverId : m.senderId)));
     
