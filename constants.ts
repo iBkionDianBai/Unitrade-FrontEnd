@@ -1,3 +1,4 @@
+// ibkiondianbai/unitrade-frontend/.../constants.ts
 import { Translations, Language } from './types';
 
 export const CATEGORIES = ['All', 'Books', 'Electronics', 'Furniture', 'Clothing', 'Sports', 'Others'];
@@ -13,7 +14,11 @@ export const DICTIONARY: Record<Language, Translations> = {
       admin: 'Admin Console',
       login: 'Login',
       logout: 'Logout',
-      sell: 'Sell Item'
+      sell: 'Sell Item',
+      logoutConfirmTitle: 'Confirm Logout',
+      logoutConfirmMsg: 'Are you sure you want to log out? You will need to sign in again.',
+      cancel: 'Cancel',
+      confirm: 'Confirm'
     },
     home: {
       searchPlaceholder: 'Search for campus treasures...',
@@ -28,6 +33,10 @@ export const DICTIONARY: Record<Language, Translations> = {
       sortPopular: 'Most Popular',
       results: 'Items found',
       hideSold: 'Hide Sold Items',
+      loadingMore: 'Loading more items...',
+      noMoreItems: 'No more items to display',
+      sold: 'SOLD',
+      backToTop: 'Back to Top',
       pagination: {
         prev: 'Previous',
         next: 'Next',
@@ -90,7 +99,15 @@ export const DICTIONARY: Record<Language, Translations> = {
       ban: 'Ban User',
       unban: 'Unban',
       takedown: 'Take Down',
-      restore: 'Restore'
+      restore: 'Restore',
+      id: 'ID',
+      user: 'User',
+      product: 'Product',
+      status: 'Status',
+      action: 'Action',
+      activeStatus: 'Active',
+      bannedStatus: 'Banned',
+      confirmMsg: 'Are you sure you want to proceed with this action?'
     },
     auth: {
       welcome: 'Welcome to UniTrade',
@@ -108,7 +125,11 @@ export const DICTIONARY: Record<Language, Translations> = {
       admin: '管理后台',
       login: '登录',
       logout: '退出',
-      sell: '发布闲置'
+      sell: '发布闲置',
+      logoutConfirmTitle: '确认退出',
+      logoutConfirmMsg: '您确定要退出登录吗？退出后需重新登录。',
+      cancel: '取消',
+      confirm: '确定'
     },
     home: {
       searchPlaceholder: '搜索校园好物...',
@@ -123,6 +144,10 @@ export const DICTIONARY: Record<Language, Translations> = {
       sortPopular: '人气最高',
       results: '个商品',
       hideSold: '隐藏已售',
+      loadingMore: '正在加载更多商品...',
+      noMoreItems: '没有更多商品了',
+      sold: '已售出',
+      backToTop: '回到顶部',
       pagination: {
         prev: '上一页',
         next: '下一页',
@@ -185,7 +210,15 @@ export const DICTIONARY: Record<Language, Translations> = {
       ban: '封禁用户',
       unban: '解封',
       takedown: '下架商品',
-      restore: '上架'
+      restore: '上架',
+      id: 'ID',
+      user: '用户',
+      product: '商品',
+      status: '状态',
+      action: '操作',
+      activeStatus: '正常',
+      bannedStatus: '已封禁',
+      confirmMsg: '您确定要执行此操作吗？'
     },
     auth: {
       welcome: '欢迎来到 UniTrade',

@@ -146,7 +146,7 @@ const CheckoutPage = () => {
                 <div className="space-y-3 text-sm border-t border-gray-100 pt-4 mb-6">
                     <div className="flex justify-between text-gray-600">
                         <span>Item Price</span>
-                        <span>${product.price.toFixed(2)}</span>
+                        <span>${Number(product.price).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
                         <span>Service Fee</span>
@@ -154,7 +154,7 @@ const CheckoutPage = () => {
                     </div>
                     <div className="flex justify-between font-bold text-lg text-gray-900 pt-2">
                         <span>{t.checkout.total}</span>
-                        <span className="text-indigo-600">${product.price.toFixed(2)}</span>
+                        <span className="text-indigo-600">${Number(product.price).toFixed(2)}</span>
                     </div>
                 </div>
 

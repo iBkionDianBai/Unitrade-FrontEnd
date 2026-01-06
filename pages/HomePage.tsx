@@ -185,7 +185,7 @@ const HomePage = () => {
                       {/* 已售出遮罩 */}
                       {product.status === 'SOLD' && (
                           <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold text-lg">
-                              SOLD
+                              {t.home.sold}
                           </div>
                       )}
 
@@ -240,7 +240,7 @@ const HomePage = () => {
         <button 
           onClick={scrollToTop}
           className="fixed bottom-8 right-8 p-3 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 hover:shadow-xl transition transform hover:-translate-y-1 z-[9999] flex items-center justify-center ring-2 ring-white"
-          title="Back to Top"
+          title={t.home.backToTop}
         >
           <ArrowUp className="w-6 h-6" />
         </button>,

@@ -40,6 +40,7 @@ export interface Review {
   id: string;
   sellerId: string;
   buyerId: string;
+  buyerName: string;
   productId: string;
   rating: number; // 1-5
   content: string;
@@ -92,6 +93,7 @@ export interface Translations {
     logoutConfirmTitle: string; // +
     logoutConfirmMsg: string;   // +
     cancel: string;             // +
+    confirm: string;
   };
   home: {
     searchPlaceholder: string;

@@ -90,6 +90,10 @@ export const api = {
         get: async (id: string): Promise<User> => {
             const response = await apiClient.get(`/users/${id}/`);
             return response.data;
+        },
+        getProfileData: async (id: string) => {
+            const response = await apiClient.get(`/users/${id}/profile_data/`);
+            return response.data;
         }
     },
 

@@ -28,14 +28,14 @@ const ProductDetailPage = () => {
         try {
             const p = await api.products.get(pid);
             setProduct(p);
-            
+
             // Parallel fetch for related data
             const [fetchedSeller, fetchedSimilars, fetchedReviews] = await Promise.all([
                 api.users.get(p.sellerId),
                 api.products.getRelated(p.category, p.id),
                 api.reviews.list(p.sellerId)
             ]);
-            
+
             setSeller(fetchedSeller);
             setSimilars(fetchedSimilars);
             setReviews(fetchedReviews);
@@ -249,7 +249,7 @@ const ProductDetailPage = () => {
                     reviews.map(r => (
                         <div key={r.id} className="border-b border-gray-50 pb-3 last:border-0">
                             <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs font-bold text-gray-700">User_{r.buyerId.substring(0,4)}</span>
+                                <span className="text-xs font-bold text-gray-700">{r.buyerName}</span>
                                 <div className="flex text-yellow-400">
                                     {[...Array(5)].map((_, i) => (
                                         <Star key={i} className={`w-3 h-3 ${i < r.rating ? 'fill-current' : 'text-gray-200'}`} />

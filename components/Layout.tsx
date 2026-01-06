@@ -123,12 +123,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     <AlertCircle className="w-8 h-8 text-red-500" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {lang === Language.EN ? "Confirm Logout" : "确认退出"}
+                    {t.nav.logoutConfirmTitle}
                   </h3>
                   <p className="text-gray-500 mb-8 text-sm leading-relaxed">
-                    {lang === Language.EN
-                        ? "Are you sure you want to log out? You will need to sign in again to access your account."
-                        : "您确定要退出登录吗？退出后，您需要重新登录才能访问您的个人信息。"}
+                    {t.nav.logoutConfirmMsg}
                   </p>
 
                   <div className="grid grid-cols-2 gap-3 w-full">
@@ -136,13 +134,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         onClick={() => setShowLogoutModal(false)}
                         className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition text-sm"
                     >
-                      {lang === Language.EN ? "Cancel" : "取消"}
+                      {t.nav.cancel}
                     </button>
                     <button
                         onClick={confirmLogout}
                         className="px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-100 text-sm"
                     >
-                      {lang === Language.EN ? "Logout" : "退出登录"}
+                      {t.nav.confirm}
                     </button>
                   </div>
                 </div>

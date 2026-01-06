@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { User, Language } from './types';
 import { DICTIONARY } from './constants';
 import { api } from './services/api';
@@ -82,7 +82,7 @@ const App = () => {
 
   return (
     <AppContext.Provider value={{ user, login, register, logout, lang, setLang, t: DICTIONARY[lang], toggleWishlist, toggleFollow }}>
-      <MemoryRouter>
+      <BrowserRouter>
         <Layout>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -98,7 +98,7 @@ const App = () => {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Layout>
-      </MemoryRouter>
+      </BrowserRouter>
     </AppContext.Provider>
   );
 };
