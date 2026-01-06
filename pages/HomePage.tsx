@@ -175,12 +175,27 @@ const HomePage = () => {
                 onClick={() => navigate(`/product/${product.id}`)}
                 className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer group"
               >
-                <div className="relative h-48 overflow-hidden bg-gray-200">
-                  <img src={product.image} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  {product.status === 'SOLD' && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold text-lg">SOLD</div>
-                  )}
-                </div>
+                  <div className="relative h-48 overflow-hidden bg-gray-200">
+                      <img
+                          src={product.image}
+                          alt={product.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+
+                      {/* 已售出遮罩 */}
+                      {product.status === 'SOLD' && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold text-lg">
+                              SOLD
+                          </div>
+                      )}
+
+                      {/* 新增：被封禁商品遮罩 - 风格与 SOLD 一致，改用红色调以示警示 */}
+                      {product.status === 'BANNED' && (
+                          <div className="absolute inset-0 bg-red-600/60 flex items-center justify-center text-white font-bold text-lg uppercase">
+                              {t.admin.takedown} {/* 使用翻译字典中的“下架/封禁”词汇 */}
+                          </div>
+                      )}
+                  </div>
                 <div className="p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-semibold text-gray-800 line-clamp-1">{product.title}</h3>
@@ -206,7 +221,7 @@ const HomePage = () => {
              <div className="flex justify-center py-8">
                 <div className="flex items-center gap-2 text-gray-500 text-sm">
                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
-                   Loading more items...
+                    {t.home.loadingMore}
                 </div>
              </div>
           )}
@@ -214,7 +229,7 @@ const HomePage = () => {
           {/* End of List Indicator */}
           {!loadingMore && visibleProducts.length === allFilteredProducts.length && allFilteredProducts.length > 0 && (
              <div className="text-center py-8 text-gray-300 text-sm">
-                No more items to display
+                 {t.home.noMoreItems}
              </div>
           )}
         </>

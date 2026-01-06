@@ -72,6 +72,15 @@ export interface Notification {
 
 // i18n Dictionary Interface
 export interface Translations {
+  common: {
+    cancel: string;
+    confirm: string;
+    loading: string;
+    id: string;
+    status: string;
+    action: string;
+    backToTop: string;
+  };
   nav: {
     home: string;
     messages: string;
@@ -80,6 +89,9 @@ export interface Translations {
     login: string;
     logout: string;
     sell: string;
+    logoutConfirmTitle: string; // +
+    logoutConfirmMsg: string;   // +
+    cancel: string;             // +
   };
   home: {
     searchPlaceholder: string;
@@ -94,6 +106,9 @@ export interface Translations {
     sortPopular: string;
     results: string;
     hideSold: string;
+    loadingMore: string;
+    noMoreItems: string;
+    sold: string;
     pagination: {
       prev: string;
       next: string;
@@ -157,6 +172,17 @@ export interface Translations {
     unban: string;
     takedown: string;
     restore: string;
+    active: string;
+    banned: string;
+    confirmAction: string; // "Are you sure?"
+    id: string;                 // +
+    user: string;               // +
+    product: string;            // +
+    status: string;             // +
+    action: string;             // +
+    activeStatus: string;       // +
+    bannedStatus: string;       // +
+    confirmMsg: string;         // +
   };
   auth: {
     welcome: string;
