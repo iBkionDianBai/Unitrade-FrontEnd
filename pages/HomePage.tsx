@@ -189,6 +189,12 @@ const HomePage = () => {
                           </div>
                       )}
 
+                      {product.status === 'RECEIVED' && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold text-lg">
+                              {t.home.sold}
+                          </div>
+                      )}
+
                       {/* 新增：被封禁商品遮罩 - 风格与 SOLD 一致，改用红色调以示警示 */}
                       {product.status === 'BANNED' && (
                           <div className="absolute inset-0 bg-red-600/60 flex items-center justify-center text-white font-bold text-lg uppercase">
