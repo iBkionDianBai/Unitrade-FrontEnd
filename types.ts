@@ -195,6 +195,37 @@ export interface Translations {
     withdraw: string;        // 新增：提现文字
     withdrawSuccess: string; // 新增：提现成功提示
     confirmReceived: string; // 新增：确认收货文字
+    systemAdmin: string; // 新增：系统管理员名称
+    takedownReason: string; // 新增：下架原因
+    takedownReasonPlaceholder: string; // 新增：下架原因占位符
+    takedownReasonRequired: string; // 新增：下架原因必填提示
+    confirmBanUser: string; // 新增：确认封禁用户
+    confirmUnbanUser: string; // 新增：确认解封用户
+    confirmTakedownProduct: string; // 新增：确认下架商品
+    confirmRestoreProduct: string; // 新增：确认恢复商品
+    userWillLoseAccess: string; // 新增：用户将失去访问权限
+    cancel: string; // 新增：取消
+    // 分页和筛选相关
+    searchUsers: string;
+    searchProducts: string;
+    filter: string;
+    perPage: string;
+    allStatus: string;
+    allRoles: string;
+    allCategories: string;
+    roleStudent: string;
+    roleAdmin: string;
+    statusActive: string;
+    statusSold: string;
+    statusReceived: string;
+    clearFilters: string;
+    totalRecords: string;
+    showing: string;
+    to: string;
+    of: string;
+    records: string;
+    prevPage: string;
+    nextPage: string;
   };
   auth: {
     welcome: string;
@@ -202,5 +233,14 @@ export interface Translations {
     registerBtn: string;
     username: string;
     password: string;
+    usernamePlaceholderLogin: string;
+    usernamePlaceholderRegister: string;
+    passwordPlaceholderLogin: string;
+    passwordPlaceholderRegister: string;
+    signingIn: string;
+    creatingAccount: string;
+    needAccount: string;
+    haveAccount: string;
+    errorOccurred: string;
   };
 }

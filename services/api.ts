@@ -11,14 +11,51 @@ const apiClient = axios.create({
     },
 });
 
-// 请求拦截器：自动注入 JWT Token
-apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+// 请求拦截器：自动添加 JWT token
+apiClient.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    return config;
-});
+);
+
+apiClient.interceptors.response.use(
+    (response) => response, // 正常响应直接返回
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            // 发现 Token 过期或非法
+            console.warn("Token expired or invalid, clearing storage...");
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('session_user');
+
+            // 可选：如果是在必须要登录的页面，可以强制跳转
+            // if (window.location.pathname !== '/') {
+            //     window.location.href = '/auth';
+            // }
+        } else if (error.response && error.response.status === 403) {
+            // 403 可能表示用户被封禁或没有权限
+            const data = error.response.data;
+            if (data && (data.isBanned || data.detail?.includes('banned'))) {
+                console.warn("User is banned, clearing storage...");
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('session_user');
+                // 强制跳转到登录页
+                if (window.location.pathname !== '/auth') {
+                    window.location.href = '/auth';
+                }
+            }
+        }
+        return Promise.reject(error);
+    }
+);
 
 export const api = {
     auth: {
@@ -32,14 +69,9 @@ export const api = {
             localStorage.setItem('access_token', response.data.access);
             localStorage.setItem('refresh_token', response.data.refresh);
 
-
-            // Note: Standard TokenObtainPairView does NOT return the user object.
-            // You may need to fetch the user separately or customize the view.
             if (response.data.user) {
                 return response.data.user;
             } else {
-                // 这是一个折中方案：我们需要知道当前登录的是谁
-                // 如果后端无法返回，您可能需要后端自定义 TokenView
                 throw new Error("Login successful but user data missing. Please check backend response.");
             }
         },
@@ -133,22 +165,33 @@ export const api = {
     },
 
     admin: {
-        getAllUsers: async (): Promise<User[]> => {
-            const response = await apiClient.get('/users/admin_list/');
+        getAllUsers: async (params?: {
+            page?: number;
+            pageSize?: number;
+            search?: string;
+            isBanned?: boolean;
+            role?: string;
+            ordering?: string;
+        }): Promise<{ results: User[]; total: number; page: number; pageSize: number; totalPages: number }> => {
+            const response = await apiClient.get('/users/admin_list/', { params });
             return response.data;
         },
-        // Add this method
-        getAllProducts: async (): Promise<Product[]> => {
-            // Admin sees all products, including banned ones
-            const response = await apiClient.get('/products/');
+        getAllProducts: async (params?: {
+            page?: number;
+            pageSize?: number;
+            search?: string;
+            status?: string;
+            category?: string;
+            ordering?: string;
+        }): Promise<{ results: Product[]; total: number; page: number; pageSize: number; totalPages: number }> => {
+            const response = await apiClient.get('/products/admin_list/', { params });
             return response.data;
         },
         toggleBanUser: async (userId: string, isBanned: boolean) => {
             await apiClient.post(`/users/${userId}/toggle_ban/`, { isBanned });
         },
-        // Add this method
-        toggleProductStatus: async (productId: string, status: string) => {
-            await apiClient.post(`/products/${productId}/toggle_status/`, { status });
+        toggleProductStatus: async (productId: string, status: string, reason?: string) => {
+            await apiClient.post(`/products/${productId}/toggle_status/`, { status, reason });
         }
     }
 };

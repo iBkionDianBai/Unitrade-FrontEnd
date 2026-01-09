@@ -30,10 +30,23 @@ const App = () => {
                 const parsed = JSON.parse(storedUser);
                 // Verify user still exists/update data
                 const freshUser = await api.auth.getCurrentUser(parsed.id);
-                if (freshUser) setUser(freshUser);
+                if (freshUser) {
+                    // 检查用户是否被封禁
+                    if (freshUser.isBanned) {
+                        console.warn('User is banned, logging out');
+                        localStorage.removeItem('session_user');
+                        localStorage.removeItem('access_token');
+                        localStorage.removeItem('refresh_token');
+                        setUser(null);
+                    } else {
+                        setUser(freshUser);
+                    }
+                }
             } catch (e) {
                 console.error("Session invalid", e);
                 localStorage.removeItem('session_user');
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
             }
         }
         setInit(true);
@@ -41,16 +54,84 @@ const App = () => {
     initSession();
   }, []);
 
-    const login = async (username: string, password: string) => { // Added password here
-        const u = await api.auth.login(username, password);       // Passing both here
-        setUser(u);
-        localStorage.setItem('session_user', JSON.stringify(u));
+    const login = async (username: string, password: string) => {
+        try {
+            const u = await api.auth.login(username, password);
+            
+            // 双重检查：即使后端返回了用户，也要检查封禁状态
+            if (u.isBanned) {
+                throw new Error(lang === Language.CN ? '您的账号已被封禁，请联系管理员' : 'Your account has been banned. Please contact support.');
+            }
+            
+            setUser(u);
+            localStorage.setItem('session_user', JSON.stringify(u));
+        } catch (error: any) {
+            console.error('Login error:', error);
+            // 提供更友好的错误信息
+            if (error.response) {
+                const status = error.response.status;
+                const data = error.response.data;
+                
+                // 检查是否是封禁错误
+                if (data && data.isBanned) {
+                    throw new Error(lang === Language.CN ? '您的账号已被封禁，请联系管理员' : 'Your account has been banned. Please contact support.');
+                }
+                
+                if (status === 401) {
+                    throw new Error(lang === Language.CN ? '用户名或密码错误' : 'Invalid username or password');
+                } else if (status === 400) {
+                    if (data && data.detail) {
+                        throw new Error(data.detail);
+                    }
+                    throw new Error(lang === Language.CN ? '请输入有效的用户名和密码' : 'Please enter valid username and password');
+                } else if (status === 500) {
+                    throw new Error(lang === Language.CN ? '服务器错误，请稍后重试' : 'Server error, please try again later');
+                } else if (data && data.detail) {
+                    throw new Error(data.detail);
+                } else {
+                    throw new Error(lang === Language.CN ? '登录失败，请重试' : 'Login failed, please try again');
+                }
+            } else if (error.request) {
+                throw new Error(lang === Language.CN ? '无法连接到服务器' : 'Cannot connect to server');
+            } else {
+                throw new Error(error.message || (lang === Language.CN ? '登录失败' : 'Login failed'));
+            }
+        }
     };
 
-    const register = async (username: string, password: string) => { // Added password here
-        const u = await api.auth.register(username, password);       // Passing both here
-        setUser(u);
-        localStorage.setItem('session_user', JSON.stringify(u));
+    const register = async (username: string, password: string) => {
+        try {
+            const u = await api.auth.register(username, password);
+            setUser(u);
+            localStorage.setItem('session_user', JSON.stringify(u));
+        } catch (error: any) {
+            console.error('Register error:', error);
+            // 提供更友好的错误信息
+            if (error.response) {
+                const status = error.response.status;
+                const data = error.response.data;
+                
+                if (status === 400) {
+                    if (data && data.username) {
+                        throw new Error(lang === Language.CN ? '该用户名已被使用' : 'Username already exists');
+                    } else if (data && data.password) {
+                        throw new Error(lang === Language.CN ? '密码格式不正确' : 'Invalid password format');
+                    } else {
+                        throw new Error(lang === Language.CN ? '注册信息无效' : 'Invalid registration information');
+                    }
+                } else if (status === 500) {
+                    throw new Error(lang === Language.CN ? '服务器错误，请稍后重试' : 'Server error, please try again later');
+                } else if (data && data.detail) {
+                    throw new Error(data.detail);
+                } else {
+                    throw new Error(lang === Language.CN ? '注册失败，请重试' : 'Registration failed, please try again');
+                }
+            } else if (error.request) {
+                throw new Error(lang === Language.CN ? '无法连接到服务器' : 'Cannot connect to server');
+            } else {
+                throw new Error(error.message || (lang === Language.CN ? '注册失败' : 'Registration failed'));
+            }
+        }
     };
 
   const logout = () => {
