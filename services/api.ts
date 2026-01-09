@@ -11,14 +11,23 @@ const apiClient = axios.create({
     },
 });
 
-// 请求拦截器：自动注入 JWT Token
-apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+apiClient.interceptors.response.use(
+    (response) => response, // 正常响应直接返回
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            // 发现 Token 过期或非法
+            console.warn("Token expired or invalid, clearing storage...");
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+
+            // 可选：如果是在必须要登录的页面，可以强制跳转
+            // if (window.location.pathname !== '/') {
+            //     window.location.href = '/auth';
+            // }
+        }
+        return Promise.reject(error);
     }
-    return config;
-});
+);
 
 export const api = {
     auth: {
